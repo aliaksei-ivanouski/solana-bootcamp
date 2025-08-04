@@ -2,7 +2,7 @@ import * as anchor from '@coral-xyz/anchor';
 import { Program } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { Votingdapp } from '../target/types/votingdapp';
-import { startAnchor } from 'solana-bankrun';
+import { ProgramTestContext, startAnchor } from 'solana-bankrun';
 import { BankrunProvider } from 'anchor-bankrun';
 import { describe, it, expect, beforeAll } from 'vitest';
 import IDL from '../target/idl/votingdapp.json' assert { type: 'json' };
@@ -12,7 +12,7 @@ const votingdappAddress = new PublicKey("JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e
 
 describe('votingdapp', () => {
 
-  let context: Context;
+  let context: ProgramTestContext;
   let provider: BankrunProvider;
   let program: Program<Votingdapp>;
 
