@@ -7,7 +7,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import IDL from '../target/idl/votingdapp.json' assert { type: 'json' };
 import BN from 'bn.js';
 
-const votingdappAddress = new PublicKey("JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H")
+const votingdappAddress = new PublicKey("3jMZPXYMF3Mk3PvbPpaHhkARax3PQ7DAbYhq2SY5kM7L")
 
 describe('votingdapp', () => {
 

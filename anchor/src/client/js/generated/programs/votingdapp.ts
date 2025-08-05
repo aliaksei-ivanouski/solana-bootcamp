@@ -14,18 +14,17 @@ import {
   type ReadonlyUint8Array,
 } from 'gill';
 import {
-  type ParsedCloseInstruction,
-  type ParsedDecrementInstruction,
-  type ParsedIncrementInstruction,
-  type ParsedInitializeInstruction,
-  type ParsedSetInstruction,
+  type ParsedInitializeCandidateInstruction,
+  type ParsedInitializePollInstruction,
+  type ParsedVoteInstruction,
 } from '../instructions';
 
 export const VOTINGDAPP_PROGRAM_ADDRESS =
-  'JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H' as Address<'JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H'>;
+  '3jMZPXYMF3Mk3PvbPpaHhkARax3PQ7DAbYhq2SY5kM7L' as Address<'3jMZPXYMF3Mk3PvbPpaHhkARax3PQ7DAbYhq2SY5kM7L'>;
 
 export enum VotingdappAccount {
-  Votingdapp,
+  Candidate,
+  Poll,
 }
 
 export function identifyVotingdappAccount(
@@ -36,12 +35,23 @@ export function identifyVotingdappAccount(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([255, 176, 4, 245, 188, 253, 124, 25])
+        new Uint8Array([86, 69, 250, 96, 193, 10, 222, 123])
       ),
       0
     )
   ) {
-    return VotingdappAccount.Votingdapp;
+    return VotingdappAccount.Candidate;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([110, 234, 167, 188, 231, 136, 153, 111])
+      ),
+      0
+    )
+  ) {
+    return VotingdappAccount.Poll;
   }
   throw new Error(
     'The provided account could not be identified as a votingdapp account.'
@@ -49,11 +59,9 @@ export function identifyVotingdappAccount(
 }
 
 export enum VotingdappInstruction {
-  Close,
-  Decrement,
-  Increment,
-  Initialize,
-  Set,
+  InitializeCandidate,
+  InitializePoll,
+  Vote,
 }
 
 export function identifyVotingdappInstruction(
@@ -64,56 +72,34 @@ export function identifyVotingdappInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([98, 165, 201, 177, 108, 65, 206, 96])
+        new Uint8Array([210, 107, 118, 204, 255, 97, 112, 26])
       ),
       0
     )
   ) {
-    return VotingdappInstruction.Close;
+    return VotingdappInstruction.InitializeCandidate;
   }
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([106, 227, 168, 59, 248, 27, 150, 101])
+        new Uint8Array([193, 22, 99, 197, 18, 33, 115, 117])
       ),
       0
     )
   ) {
-    return VotingdappInstruction.Decrement;
+    return VotingdappInstruction.InitializePoll;
   }
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([11, 18, 104, 9, 104, 174, 59, 33])
+        new Uint8Array([227, 110, 155, 23, 136, 126, 172, 25])
       ),
       0
     )
   ) {
-    return VotingdappInstruction.Increment;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([175, 175, 109, 31, 13, 152, 155, 237])
-      ),
-      0
-    )
-  ) {
-    return VotingdappInstruction.Initialize;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([198, 51, 53, 241, 116, 29, 126, 194])
-      ),
-      0
-    )
-  ) {
-    return VotingdappInstruction.Set;
+    return VotingdappInstruction.Vote;
   }
   throw new Error(
     'The provided instruction could not be identified as a votingdapp instruction.'
@@ -121,20 +107,14 @@ export function identifyVotingdappInstruction(
 }
 
 export type ParsedVotingdappInstruction<
-  TProgram extends string = 'JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H',
+  TProgram extends string = '3jMZPXYMF3Mk3PvbPpaHhkARax3PQ7DAbYhq2SY5kM7L',
 > =
   | ({
-      instructionType: VotingdappInstruction.Close;
-    } & ParsedCloseInstruction<TProgram>)
+      instructionType: VotingdappInstruction.InitializeCandidate;
+    } & ParsedInitializeCandidateInstruction<TProgram>)
   | ({
-      instructionType: VotingdappInstruction.Decrement;
-    } & ParsedDecrementInstruction<TProgram>)
+      instructionType: VotingdappInstruction.InitializePoll;
+    } & ParsedInitializePollInstruction<TProgram>)
   | ({
-      instructionType: VotingdappInstruction.Increment;
-    } & ParsedIncrementInstruction<TProgram>)
-  | ({
-      instructionType: VotingdappInstruction.Initialize;
-    } & ParsedInitializeInstruction<TProgram>)
-  | ({
-      instructionType: VotingdappInstruction.Set;
-    } & ParsedSetInstruction<TProgram>);
+      instructionType: VotingdappInstruction.Vote;
+    } & ParsedVoteInstruction<TProgram>);
