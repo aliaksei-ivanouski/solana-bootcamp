@@ -1,0 +1,32 @@
+# Project Context
+This is a Solana Anchor framework project.
+It contains on-chain Rust programs under `programs/` and TypeScript/Vitest tests under `tests/`.
+The Anchor.toml file defines the program IDs and local cluster settings.
+
+# Anchor & Solana conventions
+- On-chain programs are written in Rust using the `anchor_lang` crate.
+- The `#[derive(Accounts)]` macro defines account validation.
+- `ctx.accounts` refers to the accounts passed into the instruction.
+- Use `anchor build`, `anchor deploy`, and `anchor test` to compile, deploy, and test programs.
+- Always update the program ID in `Anchor.toml` and `declare_id!()` after redeployment.
+
+# Testing guidelines
+- TypeScript tests import Anchor via `@coral-xyz/anchor`.
+- Use `anchor.setProvider(anchor.AnchorProvider.env())` in tests.
+- Prefer using `anchor.workspace.<ProgramName>` unless manually loading IDL and program ID.
+- When writing tests, use localnet or devnet with a funded keypair.
+
+# Rust code style
+- Follow Rust 2024 edition conventions.
+- Keep instruction handlers small and delegate to helper functions when logic grows.
+- Use descriptive error enums with `#[error_code]`.
+
+# Security considerations
+- Always check account ownership, signer requirements, and mutability in `#[account]` constraints.
+- Avoid unchecked arithmetic; use `checked_add`/`checked_sub` where overflow is possible.
+- Verify PDAs with seeds and bump from `ctx.bumps`.
+
+# How to answer questions in this project
+- Prefer step-by-step guidance for Anchor commands and Solana development.
+- Include both Rust and TypeScript examples when relevant.
+- When suggesting code changes, ensure they compile and pass `anchor test`.

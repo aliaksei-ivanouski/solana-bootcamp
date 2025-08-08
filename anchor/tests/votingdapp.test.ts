@@ -7,7 +7,7 @@ import BN from 'bn.js';
 
 describe('votingdapp', () => {
 
-  const pollId = new BN(Date.now());
+  const poll_id = new BN(Date.now());
   let program: Program<Votingdapp>;
 
   beforeAll(async () => {
@@ -18,21 +18,21 @@ describe('votingdapp', () => {
 
   it('Initialize Poll', async () => {
     await program.methods.initializePoll(
-      pollId,
+      poll_id,
       "What is your favourite pinut butter?",
       new BN(0),
       new BN(1854222157),
     ).rpc();
 
     const [pollAddress] = PublicKey.findProgramAddressSync(
-      [pollId.toArrayLike(Buffer, 'le', 8)],
+      [poll_id.toArrayLike(Buffer, 'le', 8)],
       program.programId
     );
 
     const poll = await program.account.poll.fetch(pollAddress);
     console.log(poll);
 
-    expect(poll.pollId.toNumber()).toBe(pollId.toNumber());
+    expect(poll.pollId.toNumber()).toBe(poll_id.toNumber());
     expect(poll.description).toBe("What is your favourite pinut butter?");
     expect(poll.pollStart.toNumber()).toBeLessThan(poll.pollEnd.toNumber());
     expect(poll.pollStart.toNumber()).toBe(0);
@@ -43,17 +43,17 @@ describe('votingdapp', () => {
   it('Initialize Candidate', async () => {
     await program.methods.initializeCandidate(
       "Crunchy",
-      pollId,
+      poll_id,
     ).rpc();
 
     await program.methods.initializeCandidate(
       "Smooth",
-      pollId,
+      poll_id,
     ).rpc();
 
 
     const [CrunchyAddress] = PublicKey.findProgramAddressSync(
-      [pollId.toArrayLike(Buffer, 'le', 8), Buffer.from("Crunchy")],
+      [poll_id.toArrayLike(Buffer, 'le', 8), Buffer.from("Crunchy")],
       program.programId
     );
 
@@ -64,7 +64,7 @@ describe('votingdapp', () => {
     expect(Crunchy.candidateVotes.toNumber()).toBe(0);
 
     const [SmoothAddress] = PublicKey.findProgramAddressSync(
-      [pollId.toArrayLike(Buffer, 'le', 8), Buffer.from("Smooth")],
+      [poll_id.toArrayLike(Buffer, 'le', 8), Buffer.from("Smooth")],
       program.programId
     );
 
@@ -80,11 +80,11 @@ describe('votingdapp', () => {
   it('Vote', async () => {
     await program.methods.vote(
       "Crunchy",
-      pollId,
+      poll_id,
     ).rpc();
 
     const [CrunchyAddress] = PublicKey.findProgramAddressSync(
-      [pollId.toArrayLike(Buffer, 'le', 8), Buffer.from("Crunchy")],
+      [poll_id.toArrayLike(Buffer, 'le', 8), Buffer.from("Crunchy")],
       program.programId
     );
 
@@ -92,7 +92,7 @@ describe('votingdapp', () => {
     console.log(Crunchy);
 
     const [SmoothAddress] = PublicKey.findProgramAddressSync(
-      [pollId.toArrayLike(Buffer, 'le', 8), Buffer.from("Smooth")],
+      [poll_id.toArrayLike(Buffer, 'le', 8), Buffer.from("Smooth")],
       program.programId
     );
 
