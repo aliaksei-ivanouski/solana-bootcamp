@@ -1,3 +1,4 @@
+import anchor from '@coral-xyz/anchor';
 import { Program } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { Votingdapp } from '../target/types/votingdapp';
@@ -13,6 +14,8 @@ describe('votingdapp', () => {
 
   let context: ProgramTestContext;
   let provider: BankrunProvider;
+  // const provider = anchor.AnchorProvider.env();
+  // anchor.setProvider(provider);
   let program: Program<Votingdapp>;
 
   beforeAll(async () => {
@@ -53,64 +56,64 @@ describe('votingdapp', () => {
 
   it('Initialize Candidate', async () => {
     await program.methods.initializeCandidate(
-      "John Doe",
+      "Crunchy",
       new BN(1),
     ).rpc();
 
     await program.methods.initializeCandidate(
-      "Jane Smith",
+      "Smooth",
       new BN(1),
     ).rpc();
 
 
-    const [JohnDoeAddress] = PublicKey.findProgramAddressSync(
-      [new BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("John Doe")],
+    const [CrunchyAddress] = PublicKey.findProgramAddressSync(
+      [new BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("Crunchy")],
       votingdappAddress
     );
 
-    const JohnDoe = await program.account.candidate.fetch(JohnDoeAddress);
-    console.log(JohnDoe);
+    const Crunchy = await program.account.candidate.fetch(CrunchyAddress);
+    console.log(Crunchy);
 
-    expect(JohnDoe.candidateName).toBe("John Doe");
-    expect(JohnDoe.candidateVotes.toNumber()).toBe(0);
+    expect(Crunchy.candidateName).toBe("Crunchy");
+    expect(Crunchy.candidateVotes.toNumber()).toBe(0);
 
-    const [JaneSmithAddress] = PublicKey.findProgramAddressSync(
-      [new BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("Jane Smith")],
+    const [SmoothAddress] = PublicKey.findProgramAddressSync(
+      [new BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("Smooth")],
       votingdappAddress
     );
 
-    const JaneSmith = await program.account.candidate.fetch(JaneSmithAddress);
-    console.log(JaneSmith);
+    const Smooth = await program.account.candidate.fetch(SmoothAddress);
+    console.log(Smooth);
 
-    expect(JaneSmith.candidateName).toBe("Jane Smith");
-    expect(JaneSmith.candidateVotes.toNumber()).toBe(0);
+    expect(Smooth.candidateName).toBe("Smooth");
+    expect(Smooth.candidateVotes.toNumber()).toBe(0);
 
-    expect(JohnDoe.candidateName).not.toBe(JaneSmith.candidateName);
+    expect(Crunchy.candidateName).not.toBe(Smooth.candidateName);
   })
 
   it('Vote', async () => {
     await program.methods.vote(
-      "John Doe",
+      "Crunchy",
       new BN(1),
     ).rpc();
 
-    const [JohnDoeAddress] = PublicKey.findProgramAddressSync(
-      [new BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("John Doe")],
+    const [CrunchyAddress] = PublicKey.findProgramAddressSync(
+      [new BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("Crunchy")],
       votingdappAddress
     );
 
-    const JohnDoe = await program.account.candidate.fetch(JohnDoeAddress);
-    console.log(JohnDoe);
+    const Crunchy = await program.account.candidate.fetch(CrunchyAddress);
+    console.log(Crunchy);
 
-    const [JaneSmithAddress] = PublicKey.findProgramAddressSync(
-      [new BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("Jane Smith")],
+    const [SmoothAddress] = PublicKey.findProgramAddressSync(
+      [new BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("Smooth")],
       votingdappAddress
     );
 
-    const JaneSmith = await program.account.candidate.fetch(JaneSmithAddress);
-    console.log(JaneSmith);
+    const Smooth = await program.account.candidate.fetch(SmoothAddress);
+    console.log(Smooth);
 
-    expect(JohnDoe.candidateVotes.toNumber()).toBe(1);
-    expect(JaneSmith.candidateVotes.toNumber()).toBe(0);
+    expect(Crunchy.candidateVotes.toNumber()).toBe(1);
+    expect(Smooth.candidateVotes.toNumber()).toBe(0);
   })
 })
