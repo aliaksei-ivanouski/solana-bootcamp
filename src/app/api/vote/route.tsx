@@ -7,6 +7,8 @@ const IDL = require("../../../../anchor/target/idl/votingdapp.json");
 
 export const OPTIONS = GET;
 
+/// Go to browser and click on the link to vote for crunchy or smooth
+/// https://dial.to/?action=solana-action:http://localhost:3000/api/vote
 export async function GET(request: Request) {
   const actionMetadata: ActionGetResponse = {
     icon: "https://cookieandkate.com/images/2025/01/peanut-butter-recipe.jpg",
