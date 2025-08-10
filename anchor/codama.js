@@ -2,5 +2,5 @@ import { createCodamaConfig } from 'gill'
 
 export default createCodamaConfig({
   clientJs: 'anchor/src/client/js/generated',
-  idl: 'target/idl/votingdapp.json',
+  idl: 'target/idl/bootcampdapp.json',
 })

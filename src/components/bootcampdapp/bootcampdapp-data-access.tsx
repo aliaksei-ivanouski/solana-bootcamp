@@ -1,8 +1,8 @@
 import {
-  VotingdappAccount,
+  BootcampdappAccount,
   getCloseInstruction,
-  getVotingdappProgramAccounts,
-  getVotingdappProgramId,
+  getBootcampdappProgramAccounts,
+  getBootcampdappProgramId,
   getDecrementInstruction,
   getIncrementInstruction,
   getInitializeInstruction,
@@ -22,14 +22,14 @@ import { install as installEd25519 } from '@solana/webcrypto-ed25519-polyfill'
 // polyfill ed25519 for browsers (to allow `generateKeyPairSigner` to work)
 installEd25519()
 
-export function useVotingdappProgramId() {
+export function useBootcampdappProgramId() {
   const { cluster } = useWalletUi()
-  return useMemo(() => getVotingdappProgramId(cluster.id), [cluster])
+  return useMemo(() => getBootcampdappProgramId(cluster.id), [cluster])
 }
 
-export function useVotingdappProgram() {
+export function useBootcampdappProgram() {
   const { client, cluster } = useWalletUi()
-  const programId = useVotingdappProgramId()
+  const programId = useBootcampdappProgramId()
   const query = useClusterVersion()
 
   return useQuery({
@@ -39,7 +39,7 @@ export function useVotingdappProgram() {
   })
 }
 
-export function useVotingdappInitializeMutation() {
+export function useBootcampdappInitializeMutation() {
   const { cluster } = useWalletUi()
   const queryClient = useQueryClient()
   const signer = useWalletUiSigner()
@@ -47,24 +47,24 @@ export function useVotingdappInitializeMutation() {
 
   return useMutation({
     mutationFn: async () => {
-      const votingdapp = await generateKeyPairSigner()
-      return await signAndSend(getInitializeInstruction({ payer: signer, votingdapp }), signer)
+      const bootcampdapp = await generateKeyPairSigner()
+      return await signAndSend(getInitializeInstruction({ payer: signer, bootcampdapp }), signer)
     },
     onSuccess: async (tx) => {
       toastTx(tx)
-      await queryClient.invalidateQueries({ queryKey: ['votingdapp', 'accounts', { cluster }] })
+      await queryClient.invalidateQueries({ queryKey: ['bootcampdapp', 'accounts', { cluster }] })
     },
     onError: () => toast.error('Failed to run program'),
   })
 }
 
-export function useVotingdappDecrementMutation({ votingdapp }: { votingdapp: VotingdappAccount }) {
-  const invalidateAccounts = useVotingdappAccountsInvalidate()
+export function useBootcampdappDecrementMutation({ bootcampdapp }: { bootcampdapp: BootcampdappAccount }) {
+  const invalidateAccounts = useBootcampdappAccountsInvalidate()
   const signer = useWalletUiSigner()
   const signAndSend = useWalletTransactionSignAndSend()
 
   return useMutation({
-    mutationFn: async () => await signAndSend(getDecrementInstruction({ votingdapp: votingdapp.address }), signer),
+    mutationFn: async () => await signAndSend(getDecrementInstruction({ bootcampdapp: bootcampdapp.address }), signer),
     onSuccess: async (tx) => {
       toastTx(tx)
       await invalidateAccounts()
@@ -72,13 +72,13 @@ export function useVotingdappDecrementMutation({ votingdapp }: { votingdapp: Vot
   })
 }
 
-export function useVotingdappIncrementMutation({ votingdapp }: { votingdapp: VotingdappAccount }) {
-  const invalidateAccounts = useVotingdappAccountsInvalidate()
+export function useBootcampdappIncrementMutation({ bootcampdapp }: { bootcampdapp: BootcampdappAccount }) {
+  const invalidateAccounts = useBootcampdappAccountsInvalidate()
   const signAndSend = useWalletTransactionSignAndSend()
   const signer = useWalletUiSigner()
 
   return useMutation({
-    mutationFn: async () => await signAndSend(getIncrementInstruction({ votingdapp: votingdapp.address }), signer),
+    mutationFn: async () => await signAndSend(getIncrementInstruction({ bootcampdapp: bootcampdapp.address }), signer),
     onSuccess: async (tx) => {
       toastTx(tx)
       await invalidateAccounts()
@@ -86,8 +86,8 @@ export function useVotingdappIncrementMutation({ votingdapp }: { votingdapp: Vot
   })
 }
 
-export function useVotingdappSetMutation({ votingdapp }: { votingdapp: VotingdappAccount }) {
-  const invalidateAccounts = useVotingdappAccountsInvalidate()
+export function useBootcampdappSetMutation({ bootcampdapp }: { bootcampdapp: BootcampdappAccount }) {
+  const invalidateAccounts = useBootcampdappAccountsInvalidate()
   const signAndSend = useWalletTransactionSignAndSend()
   const signer = useWalletUiSigner()
 
@@ -95,7 +95,7 @@ export function useVotingdappSetMutation({ votingdapp }: { votingdapp: Votingdap
     mutationFn: async (value: number) =>
       await signAndSend(
         getSetInstruction({
-          votingdapp: votingdapp.address,
+          bootcampdapp: bootcampdapp.address,
           value,
         }),
         signer,
@@ -107,14 +107,14 @@ export function useVotingdappSetMutation({ votingdapp }: { votingdapp: Votingdap
   })
 }
 
-export function useVotingdappCloseMutation({ votingdapp }: { votingdapp: VotingdappAccount }) {
-  const invalidateAccounts = useVotingdappAccountsInvalidate()
+export function useBootcampdappCloseMutation({ bootcampdapp }: { bootcampdapp: BootcampdappAccount }) {
+  const invalidateAccounts = useBootcampdappAccountsInvalidate()
   const signAndSend = useWalletTransactionSignAndSend()
   const signer = useWalletUiSigner()
 
   return useMutation({
     mutationFn: async () => {
-      return await signAndSend(getCloseInstruction({ payer: signer, votingdapp: votingdapp.address }), signer)
+      return await signAndSend(getCloseInstruction({ payer: signer, bootcampdapp: bootcampdapp.address }), signer)
     },
     onSuccess: async (tx) => {
       toastTx(tx)
@@ -123,24 +123,24 @@ export function useVotingdappCloseMutation({ votingdapp }: { votingdapp: Votingd
   })
 }
 
-export function useVotingdappAccountsQuery() {
+export function useBootcampdappAccountsQuery() {
   const { client } = useWalletUi()
 
   return useQuery({
-    queryKey: useVotingdappAccountsQueryKey(),
-    queryFn: async () => await getVotingdappProgramAccounts(client.rpc),
+    queryKey: useBootcampdappAccountsQueryKey(),
+    queryFn: async () => await getBootcampdappProgramAccounts(client.rpc),
   })
 }
 
-function useVotingdappAccountsInvalidate() {
+function useBootcampdappAccountsInvalidate() {
   const queryClient = useQueryClient()
-  const queryKey = useVotingdappAccountsQueryKey()
+  const queryKey = useBootcampdappAccountsQueryKey()
 
   return () => queryClient.invalidateQueries({ queryKey })
 }
 
-function useVotingdappAccountsQueryKey() {
+function useBootcampdappAccountsQueryKey() {
   const { cluster } = useWalletUi()
 
-  return ['votingdapp', 'accounts', { cluster }]
+  return ['bootcampdapp', 'accounts', { cluster }]
 }

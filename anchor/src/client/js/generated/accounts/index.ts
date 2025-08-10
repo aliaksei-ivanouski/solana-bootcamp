@@ -6,5 +6,4 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from './candidate';
-export * from './poll';
+export * from './bootcampdapp';

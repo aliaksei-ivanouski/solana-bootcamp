@@ -1,4 +1,4 @@
-# voting-dapp
+# bootcamp-dapp
 
 This is a Next.js app containing:
 
@@ -14,7 +14,7 @@ This is a Next.js app containing:
 #### Download the template
 
 ```shell
-pnpm create solana-dapp@latest -t gh:solana-foundation/templates/templates/voting-dapp
+pnpm create solana-dapp@latest -t gh:solana-foundation/templates/templates/bootcamp-dapp
 ```
 
 #### Install Dependencies

@@ -6,6 +6,8 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from './initializeCandidate';
-export * from './initializePoll';
-export * from './vote';
+export * from './close';
+export * from './decrement';
+export * from './increment';
+export * from './initialize';
+export * from './set';
