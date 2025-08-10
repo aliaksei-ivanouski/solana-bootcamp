@@ -14,18 +14,16 @@ import {
   type ReadonlyUint8Array,
 } from 'gill';
 import {
-  type ParsedCloseInstruction,
-  type ParsedDecrementInstruction,
-  type ParsedIncrementInstruction,
-  type ParsedInitializeInstruction,
-  type ParsedSetInstruction,
+  type ParsedCreateJournalEntryInstruction,
+  type ParsedDeleteJournalEntryInstruction,
+  type ParsedUpdateJournalEntryInstruction,
 } from '../instructions';
 
 export const BOOTCAMPDAPP_PROGRAM_ADDRESS =
-  'JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H' as Address<'JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H'>;
+  'EJhsvpPeCpUChwyDEcKyJCLorDb89q1cfY4HPwutzF6' as Address<'EJhsvpPeCpUChwyDEcKyJCLorDb89q1cfY4HPwutzF6'>;
 
 export enum BootcampdappAccount {
-  Bootcampdapp,
+  JournalEntryState,
 }
 
 export function identifyBootcampdappAccount(
@@ -36,12 +34,12 @@ export function identifyBootcampdappAccount(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([255, 176, 4, 245, 188, 253, 124, 25])
+        new Uint8Array([113, 86, 110, 124, 140, 14, 58, 66])
       ),
       0
     )
   ) {
-    return BootcampdappAccount.Bootcampdapp;
+    return BootcampdappAccount.JournalEntryState;
   }
   throw new Error(
     'The provided account could not be identified as a bootcampdapp account.'
@@ -49,11 +47,9 @@ export function identifyBootcampdappAccount(
 }
 
 export enum BootcampdappInstruction {
-  Close,
-  Decrement,
-  Increment,
-  Initialize,
-  Set,
+  CreateJournalEntry,
+  DeleteJournalEntry,
+  UpdateJournalEntry,
 }
 
 export function identifyBootcampdappInstruction(
@@ -64,56 +60,34 @@ export function identifyBootcampdappInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([98, 165, 201, 177, 108, 65, 206, 96])
+        new Uint8Array([48, 65, 201, 186, 25, 41, 127, 0])
       ),
       0
     )
   ) {
-    return BootcampdappInstruction.Close;
+    return BootcampdappInstruction.CreateJournalEntry;
   }
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([106, 227, 168, 59, 248, 27, 150, 101])
+        new Uint8Array([156, 50, 93, 5, 157, 97, 188, 114])
       ),
       0
     )
   ) {
-    return BootcampdappInstruction.Decrement;
+    return BootcampdappInstruction.DeleteJournalEntry;
   }
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([11, 18, 104, 9, 104, 174, 59, 33])
+        new Uint8Array([113, 164, 49, 62, 43, 83, 194, 172])
       ),
       0
     )
   ) {
-    return BootcampdappInstruction.Increment;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([175, 175, 109, 31, 13, 152, 155, 237])
-      ),
-      0
-    )
-  ) {
-    return BootcampdappInstruction.Initialize;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([198, 51, 53, 241, 116, 29, 126, 194])
-      ),
-      0
-    )
-  ) {
-    return BootcampdappInstruction.Set;
+    return BootcampdappInstruction.UpdateJournalEntry;
   }
   throw new Error(
     'The provided instruction could not be identified as a bootcampdapp instruction.'
@@ -121,20 +95,14 @@ export function identifyBootcampdappInstruction(
 }
 
 export type ParsedBootcampdappInstruction<
-  TProgram extends string = 'JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H',
+  TProgram extends string = 'EJhsvpPeCpUChwyDEcKyJCLorDb89q1cfY4HPwutzF6',
 > =
   | ({
-      instructionType: BootcampdappInstruction.Close;
-    } & ParsedCloseInstruction<TProgram>)
+      instructionType: BootcampdappInstruction.CreateJournalEntry;
+    } & ParsedCreateJournalEntryInstruction<TProgram>)
   | ({
-      instructionType: BootcampdappInstruction.Decrement;
-    } & ParsedDecrementInstruction<TProgram>)
+      instructionType: BootcampdappInstruction.DeleteJournalEntry;
+    } & ParsedDeleteJournalEntryInstruction<TProgram>)
   | ({
-      instructionType: BootcampdappInstruction.Increment;
-    } & ParsedIncrementInstruction<TProgram>)
-  | ({
-      instructionType: BootcampdappInstruction.Initialize;
-    } & ParsedInitializeInstruction<TProgram>)
-  | ({
-      instructionType: BootcampdappInstruction.Set;
-    } & ParsedSetInstruction<TProgram>);
+      instructionType: BootcampdappInstruction.UpdateJournalEntry;
+    } & ParsedUpdateJournalEntryInstruction<TProgram>);

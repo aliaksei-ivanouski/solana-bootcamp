@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-bootcampdapp = "JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H"
+bootcampdapp = "EJhsvpPeCpUChwyDEcKyJCLorDb89q1cfY4HPwutzF6"
 
 [registry]
 url = "https://api.apr.dev"

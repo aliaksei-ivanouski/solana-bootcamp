@@ -1,5 +1,5 @@
 import { WalletButton } from '../solana/solana-provider'
-import { BootcampdappButtonInitialize, BootcampdappList, BootcampdappProgramExplorerLink, BootcampdappProgramGuard } from './bootcampdapp-ui'
+import { BootcampdappList, BootcampdappProgramExplorerLink, BootcampdappProgramGuard, JournalEntryForm } from './bootcampdapp-ui'
 import { AppHero } from '../app-hero'
 import { useWalletUi } from '@wallet-ui/react'
 
@@ -12,7 +12,7 @@ export default function BootcampdappFeature() {
         title="Bootcampdapp"
         subtitle={
           account
-            ? "Initialize a new bootcampdapp onchain by clicking the button. Use the program's methods (increment, decrement, set, and close) to change the state of the account."
+            ? "Create, update, or delete journal entries using the form below. All operations are performed on-chain through the Solana program."
             : 'Select a wallet to run the program.'
         }
       >
@@ -20,7 +20,7 @@ export default function BootcampdappFeature() {
           <BootcampdappProgramExplorerLink />
         </p>
         {account ? (
-          <BootcampdappButtonInitialize />
+          <JournalEntryForm />
         ) : (
           <div style={{ display: 'inline-block' }}>
             <WalletButton />

@@ -2,7 +2,7 @@
 
 use anchor_lang::prelude::*;
 
-declare_id!("JAVuBXeBZqXNtS73azhBDAoYaaAFfo4gWXoZe2e7Jf8H");
+declare_id!("EJhsvpPeCpUChwyDEcKyJCLorDb89q1cfY4HPwutzF6");
 
 #[program]
 pub mod bootcampdapp {

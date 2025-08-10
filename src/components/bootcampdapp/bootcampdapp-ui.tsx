@@ -1,19 +1,21 @@
 import { ellipsify } from '@wallet-ui/react'
 import {
   useBootcampdappAccountsQuery,
-  useBootcampdappCloseMutation,
-  useBootcampdappDecrementMutation,
-  useBootcampdappIncrementMutation,
-  useBootcampdappInitializeMutation,
   useBootcampdappProgram,
   useBootcampdappProgramId,
-  useBootcampdappSetMutation,
+  useBootcampdappCreateJournalEntryMutation,
+  useBootcampdappUpdateJournalEntryMutation,
+  useBootcampdappDeleteJournalEntryMutation,
 } from './bootcampdapp-data-access'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '../ui/textarea'
 import { ExplorerLink } from '../cluster/cluster-ui'
 import { BootcampdappAccount } from '@project/anchor'
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
+import { useWalletUi } from '@wallet-ui/react'
 
 export function BootcampdappProgramExplorerLink() {
   const programId = useBootcampdappProgramId()
@@ -68,88 +70,152 @@ function BootcampdappCard({ bootcampdapp }: { bootcampdapp: BootcampdappAccount 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bootcampdapp: {bootcampdapp.data.count}</CardTitle>
+        <CardTitle>Journal Entry: {bootcampdapp.data.title}</CardTitle>
         <CardDescription>
           Account: <ExplorerLink address={bootcampdapp.address} label={ellipsify(bootcampdapp.address)} />
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex gap-4 justify-evenly">
-          <BootcampdappButtonIncrement bootcampdapp={bootcampdapp} />
-          <BootcampdappButtonSet bootcampdapp={bootcampdapp} />
-          <BootcampdappButtonDecrement bootcampdapp={bootcampdapp} />
-          <BootcampdappButtonClose bootcampdapp={bootcampdapp} />
+        <div className="space-y-2">
+          <p><strong>Title:</strong> {bootcampdapp.data.title}</p>
+          <p><strong>Message:</strong> {bootcampdapp.data.message}</p>
+          <p><strong>Owner:</strong> {ellipsify(bootcampdapp.data.owner)}</p>
         </div>
       </CardContent>
     </Card>
   )
 }
 
-export function BootcampdappButtonInitialize() {
-  const mutationInitialize = useBootcampdappInitializeMutation()
+export function BootcampdappCreateJournalEntry({ title, message }: { title: string; message: string }) {
+  const createJournalEntryMutation = useBootcampdappCreateJournalEntryMutation()
 
   return (
-    <Button onClick={() => mutationInitialize.mutateAsync()} disabled={mutationInitialize.isPending}>
-      Initialize Bootcampdapp {mutationInitialize.isPending && '...'}
+    <Button onClick={() => createJournalEntryMutation.mutateAsync({ title, message })} disabled={createJournalEntryMutation.isPending}>
+      Create Journal Entry
     </Button>
   )
 }
 
-export function BootcampdappButtonIncrement({ bootcampdapp }: { bootcampdapp: BootcampdappAccount }) {
-  const incrementMutation = useBootcampdappIncrementMutation({ bootcampdapp })
+export function UpdateJournalEntry({ title, message }: { title: string; message: string }) {
+  const updateJournalEntryMutation = useBootcampdappUpdateJournalEntryMutation()
 
   return (
-    <Button variant="outline" onClick={() => incrementMutation.mutateAsync()} disabled={incrementMutation.isPending}>
-      Increment
+    <Button onClick={() => updateJournalEntryMutation.mutateAsync({ title, message })} disabled={updateJournalEntryMutation.isPending}>
+      Update Journal Entry
     </Button>
   )
 }
 
-export function BootcampdappButtonSet({ bootcampdapp }: { bootcampdapp: BootcampdappAccount }) {
-  const setMutation = useBootcampdappSetMutation({ bootcampdapp })
+export function DeleteJournalEntry({ title }: { title: string }) {
+  const deleteJournalEntryMutation = useBootcampdappDeleteJournalEntryMutation()
 
   return (
-    <Button
-      variant="outline"
-      onClick={() => {
-        const value = window.prompt('Set value to:', bootcampdapp.data.count.toString() ?? '0')
-        if (!value || parseInt(value) === bootcampdapp.data.count || isNaN(parseInt(value))) {
-          return
-        }
-        return setMutation.mutateAsync(parseInt(value))
-      }}
-      disabled={setMutation.isPending}
-    >
-      Set
+    <Button onClick={() => deleteJournalEntryMutation.mutateAsync({ title })} disabled={deleteJournalEntryMutation.isPending}>
+      Delete Journal Entry
     </Button>
   )
 }
 
-export function BootcampdappButtonDecrement({ bootcampdapp }: { bootcampdapp: BootcampdappAccount }) {
-  const decrementMutation = useBootcampdappDecrementMutation({ bootcampdapp })
+export function JournalEntryForm() {
+  const { account } = useWalletUi()
+  const [title, setTitle] = useState('')
+  const [message, setMessage] = useState('')
+  const [operation, setOperation] = useState<'create' | 'update' | 'delete'>('create')
+
+  const createJournalEntryMutation = useBootcampdappCreateJournalEntryMutation()
+  const updateJournalEntryMutation = useBootcampdappUpdateJournalEntryMutation()
+  const deleteJournalEntryMutation = useBootcampdappDeleteJournalEntryMutation()
+
+  const isSubmitDisabled = !account || !title.trim() || (operation !== 'delete' && !message.trim())
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (isSubmitDisabled) return
+
+    try {
+      switch (operation) {
+        case 'create':
+          await createJournalEntryMutation.mutateAsync({ title: title.trim(), message: message.trim() })
+          break
+        case 'update':
+          await updateJournalEntryMutation.mutateAsync({ title: title.trim(), message: message.trim() })
+          break
+        case 'delete':
+          await deleteJournalEntryMutation.mutateAsync({ title: title.trim() })
+          break
+      }
+
+      // Reset form after successful operation
+      setTitle('')
+      setMessage('')
+    } catch (error) {
+      console.error('Operation failed:', error)
+    }
+  }
+
+  const isLoading = createJournalEntryMutation.isPending || updateJournalEntryMutation.isPending || deleteJournalEntryMutation.isPending
 
   return (
-    <Button variant="outline" onClick={() => decrementMutation.mutateAsync()} disabled={decrementMutation.isPending}>
-      Decrement
-    </Button>
-  )
-}
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle>Journal Entry Operations</CardTitle>
+        <CardDescription>Create, update, or delete journal entries</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="operation">Operation</Label>
+            <select
+              id="operation"
+              value={operation}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setOperation(e.target.value as 'create' | 'update' | 'delete')}
+              className="w-full p-2 border border-gray-300 rounded-md"
+            >
+              <option value="create">Create</option>
+              <option value="update">Update</option>
+              <option value="delete">Delete</option>
+            </select>
+          </div>
 
-export function BootcampdappButtonClose({ bootcampdapp }: { bootcampdapp: BootcampdappAccount }) {
-  const closeMutation = useBootcampdappCloseMutation({ bootcampdapp })
+          <div className="space-y-2">
+            <Label htmlFor="title">Title *</Label>
+            <Input
+              id="title"
+              type="text"
+              value={title}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+              placeholder="Enter journal entry title"
+              required
+            />
+          </div>
 
-  return (
-    <Button
-      variant="destructive"
-      onClick={() => {
-        if (!window.confirm('Are you sure you want to close this account?')) {
-          return
-        }
-        return closeMutation.mutateAsync()
-      }}
-      disabled={closeMutation.isPending}
-    >
-      Close
-    </Button>
+          {operation !== 'delete' && (
+            <div className="space-y-2">
+              <Label htmlFor="message">Message *</Label>
+              <Textarea
+                id="message"
+                value={message}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
+                placeholder="Enter journal entry message"
+                rows={4}
+                required
+              />
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            disabled={isSubmitDisabled || isLoading}
+            className="w-full"
+          >
+            {isLoading ? 'Processing...' :
+              operation === 'create' ? 'Create Entry' :
+                operation === 'update' ? 'Update Entry' : 'Delete Entry'
+            }
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   )
 }
